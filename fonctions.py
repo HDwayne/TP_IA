@@ -30,7 +30,7 @@ def manhattan_distance(init: Rumba, goal: Rumba) -> int:
     return total_distance
 
 
-def heuristique(init: Rumba, g: int, but: Rumba):
+def heuristique(init: Rumba, but: Rumba):
     """
     Fonction qui calcule l'heuristique de l'état init en fonction de l'état but.
     """
@@ -38,10 +38,8 @@ def heuristique(init: Rumba, g: int, but: Rumba):
         raise TypeError(f"init must be of type {Rumba}")
     if not isinstance(but, init.__class__):
         raise TypeError(f"but must be of type {init.__class__}")
-    if not isinstance(g, int):
-        raise TypeError(f"g must be of type int")
     h = manhattan_distance(init, but)
-    return g + h
+    return h
 
 
 def opPoss(init: Rumba) -> list:
@@ -69,52 +67,12 @@ def estBut(init: Rumba, but: Rumba) -> bool:
         raise TypeError(f"init must be of type {Rumba}")
     if not isinstance(but, init.__class__):
         raise TypeError(f"but must be of type {init.__class__}")
-    return init == but
+    return init.__eq__(but)
 
 
-# def IDA_star(init: Rumba, goal: Rumba) -> Tuple[List[str], int]:
-#     def search(path: List[Rumba], g: int, bound: int) -> Tuple[int, List[Rumba]]:
-#         node = path[-1]
-#         f = g + heuristique(node, g, goal)
-#         if f > bound:
-#             return f, []
-#         if estBut(node, goal):
-#             return f, path
-#         min_cost = float('inf')
-#         for operation, child, cost in opPoss(node):
-#             if child not in path:
-#                 path.append(child)
-#                 new_bound, result = search(path, g + cost, bound)
-#                 if result:
-#                     return new_bound, result
-#                 min_cost = min(min_cost, new_bound)
-#                 path.pop()
-#         return min_cost, []
-
-#     path = [init]
-#     bound = heuristique(init, 0, goal)
-#     while True:
-#         new_bound, result = search(path, 0, bound)
-#         if result:
-#             operations = []
-#             for i in range(len(result) - 1):
-#                 tige_depart, tige_arrivee = None, None
-#                 for tige_index in range(init.size()):
-#                     if result[i].tiges[tige_index] != result[i + 1].tiges[tige_index]:
-#                         if result[i].tiges[tige_index].head() == result[i + 1].tiges[tige_index].head():
-#                             tige_arrivee = tige_index
-#                         else:
-#                             tige_depart = tige_index
-#                 print(tige_arrivee, tige_depart)
-#                 operations.append(
-#                     f"Deplacer {result[i].tiges[tige_depart].head()} de Tige {tige_depart + 1} à Tige {tige_arrivee + 1}")
-#             return operations, new_bound
-#         bound = new_bound
-
-
-def search(path: List[Rumba], g: int, bound, is_goal, h, successors, but):
+def search(path: List[Rumba], g: int, bound, is_goal, heuristique, successors, but):
     node = path[-1]
-    f = g + h(node, g, but)
+    f = g + heuristique(node, but)
     if f > bound:
         return f
     if is_goal(node, but):
@@ -122,27 +80,26 @@ def search(path: List[Rumba], g: int, bound, is_goal, h, successors, but):
     min = float("inf")
     for op, etat, cout in successors(node):
         if etat not in path:
-            # print(f"Opération: {op}")
             path.append(etat)
-            t = search(path, g + cout, bound, is_goal, h, successors, but)
+            t = search(path, g + cout, bound, is_goal,
+                       heuristique, successors, but)
             if t == "found":
                 return "found"
             if t < min:
                 min = t
             path.pop()
-    # print("path", path)
     return min
 
 
 def IDA_star(depart: Rumba,
              is_goal: Callable[[Rumba, Rumba], bool],
              successors: Callable[[Rumba], List[Tuple[str, Rumba, int]]],
-             h: Callable[[Rumba, int, Rumba], int],
+             heuristique: Callable[[Rumba, int, Rumba], int],
              but: Rumba) -> Optional[Rumba]:
-    bound = h(depart, 0, but)
+    bound = heuristique(depart, but)
     path = [depart]
     while True:
-        t = search(path, 0, bound, is_goal, h, successors, but)
+        t = search(path, 0, bound, is_goal, heuristique, successors, but)
         print("bound", bound)
         if t == "found":
             return (path, bound)

@@ -119,3 +119,17 @@ def but_6() -> Rumba:
     rb.tiges[2].empiler(Element("rouge", 3))
     rb.tiges[2].empiler(Element("jaune", 3))
     return rb
+
+
+def but_7() -> Rumba:
+    rb = Rumba(3, 4)
+    rb.tiges[0].empiler(Element("bleu", 1))
+    rb.tiges[0].empiler(Element("rouge", 1))
+    rb.tiges[0].empiler(Element("jaune", 1))
+    rb.tiges[1].empiler(Element("bleu", 2))
+    rb.tiges[1].empiler(Element("rouge", 2))
+    rb.tiges[1].empiler(Element("jaune", 2))
+    rb.tiges[2].empiler(Element("bleu", 3))
+    rb.tiges[2].empiler(Element("rouge", 3))
+    rb.tiges[2].empiler(Element("jaune", 3))
+    return rb

@@ -16,6 +16,8 @@ but2 = but_2()
 but3 = but_3()
 but4 = but_4()
 but5 = but_5()
+but6 = but_6()
+but7 = but_7()
 
 # afficher
 
@@ -35,10 +37,12 @@ but5 = but_5()
 # estBut
 
 # print(estBut(si, but5))
-# print(estBut(but5, but5))
+# print(estBut(but6, but7))
+# print(but6.afficherEtat())
+# print(opPoss(but6))
 
 # Fonction IDA * {retourne un état-solution ou échec}
-result = IDA_star(si1, estBut, opPoss, heuristique, but2)
+result = IDA_star(si1, estBut, opPoss, heuristique, but3)
 print(result)
 
 # result.afficherEtat()
