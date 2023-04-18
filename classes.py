@@ -87,9 +87,6 @@ class Tige:
     def max_size(self) -> int:
         return self.taille
 
-    def as_list(self) -> list:
-        return self.elements
-
     def head(self) -> Element:
         if self.est_vide():
             return None
@@ -161,21 +158,7 @@ class Rumba:
         print(" | ".join(sperator))
         print(" | ".join(aligned_labels))
 
-    def trouverDestinations(self, tige_depart: Tige) -> list:
-        destinations = []
-        for tige in self.tiges:
-            if tige != tige_depart:
-                if not tige.est_pleine():
-                    destinations.append(tige)
-        return destinations
-
     def opPoss(self) -> list:
-        """
-        Fonction qui prend en paramètre un état de type Rumba et renvoi une liste de tuple de la forme (opération, nouvel état, coût).
-        Pour chaque état de la liste de tuple, la valeur de la variable operation est une chaîne de caractère indiquant l'opération
-        qui a été effectuée pour passer de l'état init à cet état, nouvel_etat est l'état résultant de l'opération et coût est le coût
-        de l'opération.
-        """
         operations = []
         for i, tige_depart in enumerate(self.tiges):
             for j, tige_arrivee in enumerate(self.tiges):

@@ -5,8 +5,7 @@ description:
     Ce fichier contient les fonctions utilisées par le programme.
 """
 
-from typing import Callable, List, Optional, Tuple
-from copy import deepcopy
+from typing import Callable, List, Optional
 from classes import Rumba
 
 ################################################################################
@@ -43,22 +42,33 @@ def nombreMalMis(init: Rumba, goal: Rumba) -> int:
 
 
 def search(path: List[Rumba], g: int, bound, heuristique, but):
+    # Récuperation du dernier noeud
     node = path[-1]
+
+    # Calcul de f
     f = g + heuristique(node, but)
+
+    # conditions d'arrêt
+    if node == but:
+        return "FOUND"
+
     if f > bound:
         return f
-    if node == but:
-        return "found"
+
+    # Recherche
     min = float("inf")
-    for op, etat, cout in node.opPoss():
-        if etat not in path:
-            path.append(etat)
-            t = search(path, g + cout, bound,
-                       heuristique, but)
-            if t == "found":
-                return "found"
+    for op, etatSucc, cout in node.opPoss():
+        if etatSucc not in path:
+            path.append(etatSucc)
+
+            t = search(path, g + cout, bound, heuristique, but)
+
+            if t == "FOUND":
+                return "FOUND"
+
             if t < min:
                 min = t
+
             path.pop()
     return min
 
@@ -66,13 +76,20 @@ def search(path: List[Rumba], g: int, bound, heuristique, but):
 def IDA_star(depart: Rumba,
              heuristique: Callable[[Rumba, Rumba], int],
              but: Rumba) -> Optional[Rumba]:
+    # Initialisation
+
     bound = heuristique(depart, but)
     path = [depart]
+
+    # Boucle principale
     while True:
         t = search(path, 0, bound, heuristique, but)
         print("bound", bound)
-        if t == "found":
+
+        if t == "FOUND":
             return (path, bound)
-        elif t == float("inf"):
-            return "no solution"
+
+        if t == float("inf"):
+            return "NOT FOUND"
+
         bound = t
