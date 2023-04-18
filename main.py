@@ -26,8 +26,8 @@ but7 = but_7()
 
 # heuristique
 
-# print(heuristique(si, 0, but5))
-# print(heuristique(si, 0, si))
+# print(heuristique(si1, but5))
+# print(heuristique(si1, si1))
 
 # opPoss
 
@@ -41,12 +41,8 @@ but7 = but_7()
 # print(but6.afficherEtat())
 # print(opPoss(but6))
 
-# Fonction IDA * {retourne un état-solution ou échec}
-result = IDA_star(si1, estBut, opPoss, heuristique, but3)
+result = IDA_star(si1, nombreMalMis, but3)
 print(result)
-
-# result.afficherEtat()
-# print(estBut(result, but1))
 
 # for but in [but1, but2, but3, but4, but5]:
 #     result = IDA_star(si1, but)

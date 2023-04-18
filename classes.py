@@ -6,6 +6,9 @@ description:
 """
 
 
+from copy import deepcopy
+
+
 class TerminalColors:
     WHITE = '\033[97m'
     BLUE = '\033[94m'
@@ -16,10 +19,9 @@ class TerminalColors:
 
 class Element:
     def __init__(self, couleur: str, chiffre: int):
-        if type(couleur) is not str:
-            raise TypeError("couleur doit être une chaîne de caractères")
-        if type(chiffre) is not int:
-            raise TypeError("chiffre doit être un entier")
+        assert type(
+            couleur) is str, "couleur doit être une chaîne de caractères"
+        assert type(chiffre) is int, "chiffre doit être un entier"
         self.couleur = couleur
         self.chiffre = chiffre
 
@@ -29,14 +31,9 @@ class Element:
     def __eq__(self, other) -> bool:
         if (other == None):
             return False
-        if not isinstance(other, self.__class__):
-            raise TypeError(
-                f"other must be of type {self.__class__} ({other})")
         return self.couleur == other.couleur and self.chiffre == other.chiffre
 
     def __ne__(self, other) -> bool:
-        if not isinstance(other, self.__class__):
-            raise TypeError(f"other must be of type {self.__class__}")
         return not self.__eq__(other)
 
     def colored(self) -> str:
@@ -53,10 +50,8 @@ class Element:
 
 class Tige:
     def __init__(self, taille: int):
-        if not isinstance(taille, int):
-            raise TypeError("taille doit être un entier")
-        if taille <= 0:
-            raise ValueError("La taille doit être positive")
+        assert type(taille) is int, "taille doit être un entier"
+        assert taille > 0, "La taille doit être positive"
         self.taille: int = taille
         self.elements: list = []
 
@@ -64,13 +59,9 @@ class Tige:
         return str([str(element) for element in self.elements]) + f" - {self.size()} / {self.max_size()}"
 
     def __eq__(self, other) -> bool:
-        if not isinstance(other, self.__class__):
-            raise TypeError(f"other must be of type {self.__class__}")
         return self.elements == other.elements
 
     def __ne__(self, other) -> bool:
-        if not isinstance(other, self.__class__):
-            raise TypeError(f"other must be of type {self.__class__}")
         return not self.__eq__(other)
 
     def est_vide(self) -> bool:
@@ -80,8 +71,6 @@ class Tige:
         return self.size() == self.max_size()
 
     def empiler(self, element: Element) -> None:
-        if not isinstance(element, Element):
-            raise TypeError("element must be of type Element")
         try:
             self.elements.append(element)
         except Exception as e:
@@ -109,10 +98,8 @@ class Tige:
 
 class Rumba:
     def __init__(self, tailleTige: int, taille: int):
-        if not isinstance(tailleTige, int):
-            raise TypeError("tailleTige must be of type int")
-        if not isinstance(taille, int):
-            raise TypeError("taille must be of type int")
+        assert type(tailleTige) is int, "tailleTige doit être un entier"
+        assert type(taille) is int, "taille doit être un entier"
         self.taille = taille
         self.tiges: list[Tige] = [Tige(tailleTige) for i in range(taille)]
 
@@ -120,13 +107,9 @@ class Rumba:
         return "\n".join([f"Tige {i+1} : {tiges}" for i, tiges in enumerate(self.tiges)])
 
     def __eq__(self, other) -> bool:
-        if not isinstance(other, self.__class__):
-            raise TypeError(f"other must be of type {self.__class__}")
         return all([tige == other_tige for tige, other_tige in zip(self.tiges, other.tiges)])
 
     def __ne__(self, other) -> bool:
-        if not isinstance(other, self.__class__):
-            raise TypeError(f"other must be of type {self.__class__}")
         return not self.__eq__(other)
 
     def __getitem__(self, index: int) -> Tige:
@@ -144,16 +127,6 @@ class Rumba:
         return self.taille
 
     def deplacer(self, index_depart: int, index_arrivee: int) -> None:
-        if not isinstance(index_depart, int):
-            raise TypeError("index_depart must be of type int")
-        if not isinstance(index_arrivee, int):
-            raise TypeError("index_arrivee must be of type int")
-        if index_depart < 0 or index_depart > self.size():
-            raise ValueError(
-                "index_depart must be between 0 and the size of the game")
-        if index_arrivee < 0 or index_arrivee > self.size():
-            raise ValueError(
-                "index_arrivee must be between 0 and the size of the game")
         td = self.tiges[index_depart-1]
         ta = self.tiges[index_arrivee-1]
         if not td.est_vide():
@@ -189,10 +162,6 @@ class Rumba:
         print(" | ".join(aligned_labels))
 
     def trouverDestinations(self, tige_depart: Tige) -> list:
-        if not isinstance(tige_depart, Tige):
-            raise TypeError("tige_depart must be of type Tige")
-        if tige_depart not in self.tiges:
-            raise ValueError("tige_depart must be in the game")
         destinations = []
         for tige in self.tiges:
             if tige != tige_depart:
@@ -200,14 +169,19 @@ class Rumba:
                     destinations.append(tige)
         return destinations
 
-    def nombreMalMis(self, but: 'Rumba') -> int:
-        if not isinstance(but, self.__class__):
-            raise TypeError(f"but must be of type {self.__class__}")
-        mal_places = 0
-        for i, tige in enumerate(self.tiges):
-            for j, element in enumerate(tige.elements):
-                if (j >= but.tiges[i].size()):
-                    mal_places += 1
-                elif element != but.tiges[i].elements[j]:
-                    mal_places += 1
-        return mal_places
+    def opPoss(self) -> list:
+        """
+        Fonction qui prend en paramètre un état de type Rumba et renvoi une liste de tuple de la forme (opération, nouvel état, coût).
+        Pour chaque état de la liste de tuple, la valeur de la variable operation est une chaîne de caractère indiquant l'opération
+        qui a été effectuée pour passer de l'état init à cet état, nouvel_etat est l'état résultant de l'opération et coût est le coût
+        de l'opération.
+        """
+        operations = []
+        for i, tige_depart in enumerate(self.tiges):
+            for j, tige_arrivee in enumerate(self.tiges):
+                if i != j and not tige_depart.est_vide() and not tige_arrivee.est_pleine():
+                    nouvel_etat = deepcopy(self)
+                    nouvel_etat.deplacer(i, j)
+                    operation = f"Deplacer {tige_depart.head()} de Tige {i+1} à Tige {j+1}"
+                    operations.append((operation, nouvel_etat, 1))
+        return operations
