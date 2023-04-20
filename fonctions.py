@@ -84,7 +84,7 @@ def IDA_star(depart: Rumba,
     # Boucle principale
     while True:
         t = search(path, 0, bound, heuristique, but)
-        print("bound", bound)
+        # print("bound", bound)
 
         if t == "FOUND":
             return (path, bound)

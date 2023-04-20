@@ -124,8 +124,8 @@ class Rumba:
         return self.taille
 
     def deplacer(self, index_depart: int, index_arrivee: int) -> None:
-        td = self.tiges[index_depart-1]
-        ta = self.tiges[index_arrivee-1]
+        td = self.tiges[index_depart]
+        ta = self.tiges[index_arrivee]
         if not td.est_vide():
             if not ta.est_pleine():
                 ta.empiler(td.depiler())
